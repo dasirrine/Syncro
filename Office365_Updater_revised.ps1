@@ -1,29 +1,25 @@
 Import-Module $env:SyncroModule -WarningAction SilentlyContinue
 
-#VARIABLES
-# $channel {"values"??"current-channel","monthly-enterprise-channel","semi-annual-enterprise-channel"],"default":"current-channel","index":0}
-# $forceUpdate {"values"??"No","Yes"],"default":"No","index":0}
-#SCRIPT
-#Language : PowerShell
-#Run As: Logged in User
 <#
+.VARIABLES
+$channel {"values"??"current-channel","monthly-enterprise-channel","semi-annual-enterprise-channel"],"default":"current-channel","index":0}
+$forceUpdate {"values"??"No","Yes"],"default":"No","index":0}
+.SCRIPT
+Language : PowerShell
+Run As: Logged in User
 .SYNOPSIS
 Office365 Updater for Syncro
 .DESCRIPTION
 Checks  Office365 build and updates to latest version based on selected channel
 .NOTES
-Version : 1.2.1
-Author(s) : Mar Szt
+Version : 1.2.2
+Author: Mar Szt
+(expanded upon by David Sirrine @ CNS 2023-03-15)
 .EXAMPLE
-Update-Office365
-Checks for latest version in current channel and updates if needed
-
 Update-Office365 -channel "monthly-enterprise-channel"
 Checks for latest version in monthly enterprise channel and updates if needed
-
 Update-Office365 -forceUpdate $true
-Checks for latest version in current channel and if needed - it will force close all office apps and update
-
+Checks for latest version in current channel (default) and force close all office apps if needed
 #>
 
 #set default O365 updater parameters
@@ -38,7 +34,7 @@ $build_installed = (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Office\Clic
 
 #check if O365 is installed; log O365 version in Syncro
 if ( $null -eq $build_installed ) {
-	Write-Host "update not required; MS Office 365 not installed"
+    Write-Host "update not required; MS Office 365 not installed"
 	Set-Asset-Field -Name "O365 version" -Value "n/a"
 } else {
 	#log O365 version installed before updates
@@ -60,12 +56,13 @@ if ( $null -eq $build_installed ) {
 		if (Test-Path $updater) {
 
 			#user broadcast message
-			$message = "Your Microsoft Office needs an urgent update to improve its performance and security. To ensure that the changes are applied, please restart your system at your earliest convenience."
+			$message = "Your Microsoft Office needs an urgent update to improve its performance and security. After the update finishes, please restart your system at your earliest convenience."
 			Broadcast-Message -Title "Updates Notification" -Message $message -LogActivity "true"
 
 			#start update
 			Write-Host "Updating Office from build $build_installed to $build_latest"
 			Start-Process -FilePath $updater -ArgumentList $updater_args -Wait
+			Start-Sleep -Seconds 120
 			if ( -not $error ) {
 				$updateComplete = $true
 				$build_installed = (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Configuration').VersionToReport
