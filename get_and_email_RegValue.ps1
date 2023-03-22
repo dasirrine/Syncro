@@ -8,7 +8,6 @@ function Test-RegistryValue {
 		[parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] $Path,
 		[parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] $Value
 	)
-	
 	If ( Test-Path -Path $Path ) {
 		try {
 			Get-ItemProperty -Path $Path | Select-Object -ExpandProperty $Value -ErrorAction Stop | Out-Null
