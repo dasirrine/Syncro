@@ -1,4 +1,4 @@
-#Import-Module $env:SyncroModule
+Import-Module $env:SyncroModule
 
 $regPath = "HKLM:\Software\ThreatLocker"
 $valueName = "ComputerId"
