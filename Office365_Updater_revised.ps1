@@ -62,9 +62,9 @@ if ( $null -eq $build_installed ) {
 			#start update
 			Write-Host "Updating Office from build $build_installed to $build_latest"
 			Start-Process -FilePath $updater -ArgumentList $updater_args -Wait
-			Start-Sleep -Seconds 120
 			if ( -not $error ) {
 				$updateComplete = $true
+				Start-Sleep -Seconds 90
 				$build_installed = (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Configuration').VersionToReport
 				#log update in Syncro
 				Log-Activity -Message "critical update" -EventName "Office 365 updated to $build_installed"
