@@ -1,4 +1,8 @@
-
+#
+# batteryHealthMonitor.ps1 by David Sirrine @ CNS Computer Services, LLC
+# source: https://github.com/dasirrine/Syncro/blob/main/batteryHealthMonitor.ps1
+# latest revision 2024-04-18
+#
 # Monitors battery health by comparing the full charge capacity to the design
 # capacity. Specified percentage is the threshold below which a battery is
 # considered "unhealthy," e.g. inputting 40% would trigger the alert if the
@@ -9,8 +13,8 @@
 # NOTE: batteries with an ID containing "UPS" are excluded, as the status of
 #       UPSs does not appear to be reported correctly by POWERCFG.
 # 
-# [based on the script "CyberDrain.com - Battery Health Monitor"]
-# [from the Community Library.]
+# [based on the script "CyberDrain.com - Battery Health Monitor"
+# from the Community Library.]
 
 
 Import-Module $env:SyncroModule -WarningAction SilentlyContinue
@@ -51,6 +55,7 @@ if ( $Report ) {
 		#exclude UPS batteries
 		if ($batt.ID -notlike "*UPS*") {
 
+			#calculate the capacity percentage and format for readability
 			$designCap = [Math]::Round($batt.DesignCapacity / 1000, 2)
 			$fullCap = [Math]::Round($batt.FullChargeCapacity / 1000, 2)
 			$fullPercent = [int64]$batt.FullChargeCapacity * 100 / [int64]$batt.DesignCapacity
@@ -60,7 +65,7 @@ if ( $Report ) {
 				#battery capacity is below the specified threshold
 				$aboveORbelow = "below"
 				$andORbut = "but"
-				$script:upload = $true
+				$script:uploadXML = $true
 				#raise an alert per failed battery
 				Rmm-Alert -Category "Battery_Health" -Body "Battery `"$($batt.id)`" charge capacity is $fullPercent% of rated capacity. Charge capacity/Rated capacity is $fullCap/$designCap wH." -WarningAction SilentlyContinue
 			} else {
@@ -69,14 +74,13 @@ if ( $Report ) {
 				$andORbut = "and"
 			}
 			#output results *per battery*
-			Write-Host "Charge capacity of the battery ($fullPercent%) is $aboveORbelow the specified threshold of $alertPercent%."
-			Write-Host "Rated capacity of the battery is $designCap wH $andORbut the current maximum charge is $fullCap wH."
-			Write-Host "The battery ID is $($batt.id)."
+			Write-Host "Charge capacity of battery ($batt.id) is $aboveORbelow the specified threshold of $alertPercent%."
+			Write-Host "Rated capacity of the battery is $designCap wH $andORbut the current maximum charge is $fullCap wH ($fullPercent%)."
 
 		}
 	}
 	#upload the results XML file if ANY battery failed
-	if ( $script:upload ) { Upload-File -FilePath "$tmpfolder\$reportFile" -WarningAction SilentlyContinue }
+	if ( $script:uploadXML ) { Upload-File -FilePath "$tmpfolder\$reportFile" -WarningAction SilentlyContinue }
 
 } else {
     Write-Host "This device does not have a battery to monitor, or the status of the batteries could not be found."
