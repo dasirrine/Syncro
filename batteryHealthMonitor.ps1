@@ -1,3 +1,4 @@
+#
 # batteryHealthMonitor.ps1 by David Sirrine @ CNS Computer Services, LLC
 # source: https://github.com/dasirrine/Syncro/blob/main/batteryHealthMonitor.ps1
 # latest revision 2024-04-18
@@ -47,8 +48,8 @@ try {
     #gather battery data from POWERCFG output
     [xml]$Report = Get-Content "$tmpfolder\$reportFile" -ErrorAction Stop
 } catch {
-	#exit if the XML file didn't load (e.g. if it failed to generate)		
-    Write-Host "This device does not have a battery to monitor, or the status of the batteries could not be found.`n"
+	#exit if the XML file didn't load (e.g. if it failed to generate)
+	Write-Host "This device does not have a battery to monitor, or the status of the batteries could not be found.`n"
 	$_
     exit
 }
@@ -58,7 +59,7 @@ foreach ($batt in $Report.BatteryReport.Batteries.Battery) {
 	#exclude UPS batteries
 	if ($batt.ID -notlike "*UPS*") {
 
-		#calculate the capacity percentage and format for readability
+		#calculate the capacity percentage and round for readability
 		$designCap = [Math]::Round($batt.DesignCapacity / 1000, 2)
 		$fullCap = [Math]::Round($batt.FullChargeCapacity / 1000, 2)
 		$fullPercent = [int64]$batt.FullChargeCapacity * 100 / [int64]$batt.DesignCapacity
@@ -89,8 +90,8 @@ foreach ($batt in $Report.BatteryReport.Batteries.Battery) {
 }
 
 #timestamp battery status and write to Asset custom field
-$battStatus = (Get-Date -Format "M/d/yyyy h:mmtt") + " - " + $battStatus + "`n"
+$battStatus = (Get-Date -Format "M/d/yyyy h:mmtt") + " - " + $battStatus
 Set-Asset-Field -Name "Battery Health" -Value $battStatus -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
 
-#upload the results XML file if ANY battery failed
+#upload the results XML file if *any* battery failed
 if ( $script:uploadXML ) { Upload-File -FilePath "$tmpfolder\$reportFile" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue }
