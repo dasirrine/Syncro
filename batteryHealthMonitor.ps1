@@ -1,7 +1,7 @@
 
 # Monitors battery health by comparing the full charge capacity to the design
 # capacity. Specified percentage is the threshold below which a battery is
-# considered "unhealthy." e.g. inputting 40% would trigger the alert if the
+# considered "unhealthy," e.g. inputting 40% would trigger the alert if the
 # battery's full charge capacity is less than 40% of its design capacity.
 #
 # $alertPercent defaults to 50% if no value is provided at runtime.
@@ -9,7 +9,8 @@
 # NOTE: batteries with an ID containing "UPS" are excluded, as the status of
 #       UPSs does not appear to be reported correctly by POWERCFG.
 # 
-# [based on CyberDrain script "CyberDrain.com - Battery Health Monitor"]
+# [based on the script "CyberDrain.com - Battery Health Monitor"]
+# [from the Community Library.]
 
 
 Import-Module $env:SyncroModule -WarningAction SilentlyContinue
