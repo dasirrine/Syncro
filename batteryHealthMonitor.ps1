@@ -80,10 +80,10 @@ foreach ($batt in $Report.BatteryReport.Batteries.Battery) {
 
 		#collect battery status for Asset custom field
 		if ($battStatus) { $battStatus = " / " }
-		$battStatus = $battStatus + "`"$($batt.id)`": $fullPercent% ($fullCap/$designCap wH)"
+		$battStatus = $battStatus + "Battery `"$($batt.id)`": $fullPercent% ($fullCap/$designCap wH)"
 
 		#display results *per battery*
-		Write-Host "Charge capacity of battery ($batt.id) is $aboveORbelow the specified threshold of $alertPercent%."
+		Write-Host "Charge capacity of battery `"$($batt.id)`" is $aboveORbelow the specified threshold of $alertPercent%."
 		Write-Host "Rated capacity of the battery is $designCap wH $andORbut the current maximum charge is $fullCap wH ($fullPercent%)."
 		
 	}
