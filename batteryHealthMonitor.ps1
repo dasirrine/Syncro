@@ -1,4 +1,4 @@
-#
+
 # batteryHealthMonitor.ps1 by David Sirrine @ CNS Computer Services, LLC
 # source: https://github.com/dasirrine/Syncro/blob/main/batteryHealthMonitor.ps1
 # latest revision 2024-04-18
@@ -23,7 +23,7 @@
 
 Import-Module $env:SyncroModule -WarningAction SilentlyContinue
 
- # set default health threshold if not provided at runtime
+ ### set default health threshold if not provided at runtime ###
 if (-not $alertPercent) { $alertPercent = 50 }
 
 ### location and name of XML results file ###
@@ -95,3 +95,4 @@ Set-Asset-Field -Name "Battery Health" -Value $battStatus -ErrorAction SilentlyC
 
 #upload the results XML file if *any* battery failed
 if ( $script:uploadXML ) { Upload-File -FilePath "$tmpfolder\$reportFile" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue }
+
