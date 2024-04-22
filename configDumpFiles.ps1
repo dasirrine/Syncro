@@ -4,11 +4,14 @@
 # latest revision 2024-04-22
 
 # Sets Windows Crash (BSoD) settings to create full, kernel-only, small, or
-# no memory dumps and keep all or only the last memory dump.
+# no memory dumps; whether all dump files should be kept or only the latest;
+# and whether the device should restart after the crash.
 #
-# Defaults to "Complete" for debugging purposes,
-# and "overwrite" to save disk space.
+# Defaults to "Complete" for debugging purposes, "overwrite" to save disk space,
+# and "restart" for continuity and user convenience.
 
+
+ $CrashBehaviour = Get-WmiObject Win32_OSRecoveryConfiguration -EnableAllPrivileges
 
 #set default dump level to "Complete"
 if {-not $dumpLevel) { $dumpLevel = "Complete" }
@@ -39,4 +42,13 @@ if ($overwriteDebugFiles="no") {
 } else {
 	Write-Host "only the last dump file will be saved."
 	$CrashBehaviour | Set-WmiInstance -Arguments @{ OverwriteExistingDebugFile=$True }
+}
+
+#restart the PC after a crash unless specified
+if ($restartAfterCrash="no") {
+	Write-Host "Device will stop indefinitely at the `"blue screen`" after crashing."
+	$CrashBehaviour | Set-WmiInstance -Arguments @{ AutoReboot=$False }
+} else {
+	Write-Host "Device will skip the `"blue screen`" and restart after each crash."
+	$CrashBehaviour | Set-WmiInstance -Arguments @{ AutoReboot=$True }
 }
