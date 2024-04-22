@@ -7,14 +7,13 @@
 # no memory dumps; whether all dump files should be kept or only the latest;
 # and whether the device should restart after the crash.
 #
-# Defaults to "Complete" for debugging purposes, "overwrite" to save disk space,
+# Defaults to "Kernel" for debugging purposes, "overwrite" to save disk space,
 # and "restart" for continuity and user convenience.
 
 
 $crashSettings = Get-WmiObject Win32_OSRecoveryConfiguration -EnableAllPrivileges
 
-#set default dump level to "Complete"
-if {-not $dumpLevel) { $dumpLevel = "Complete" }
+if {-not $dumpLevel) { $dumpLevel = "Kernel" }
 
 #hash to decode human-readable dump levels
 $lvlHash = @{
