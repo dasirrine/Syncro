@@ -11,7 +11,7 @@
 # and "restart" for continuity and user convenience.
 
 
- $CrashBehaviour = Get-WmiObject Win32_OSRecoveryConfiguration -EnableAllPrivileges
+$crashSettings = Get-WmiObject Win32_OSRecoveryConfiguration -EnableAllPrivileges
 
 #set default dump level to "Complete"
 if {-not $dumpLevel) { $dumpLevel = "Complete" }
@@ -28,6 +28,7 @@ $lvl = $lvlHash[$dumpLevel]
 #set the crash memory dump level
 if (($lvl) -and ($lvl -in 0..3)) {
 	"Crash dump files will be set to level: `"$dumpLevel`""
+	# dump level can't be set via variable $crashSettings (?)
 	Get-WmiObject -Class Win32_OSRecoveryConfiguration -EnableAllPrivileges | Set-WmiInstance -Arguments @{ DebugInfoType=$lvl }
 } else {
     Write-Host "Invalid dump level specified."
@@ -36,19 +37,19 @@ if (($lvl) -and ($lvl -in 0..3)) {
 #overwrite memory dump files unless specified
 if ($overwriteDebugFiles="no") {
 	Write-Host "ALL dump files will be retained."
-	$CrashBehaviour | Set-WmiInstance -Arguments @{ OverwriteExistingDebugFile=$False }
+	$crashSettings | Set-WmiInstance -Arguments @{ OverwriteExistingDebugFile=$False }
 	###warn if "Complete" dump files will be retained
 	if ($lvl=1) { Write-Host "WARNING: Saving all `"Complete`" dump files can quickly fill the drive!" }
 } else {
 	Write-Host "only the last dump file will be saved."
-	$CrashBehaviour | Set-WmiInstance -Arguments @{ OverwriteExistingDebugFile=$True }
+	$crashSettings | Set-WmiInstance -Arguments @{ OverwriteExistingDebugFile=$True }
 }
 
 #restart the PC after a crash unless specified
 if ($restartAfterCrash="no") {
 	Write-Host "Device will stop indefinitely at the `"blue screen`" after crashing."
-	$CrashBehaviour | Set-WmiInstance -Arguments @{ AutoReboot=$False }
+	$crashSettings | Set-WmiInstance -Arguments @{ AutoReboot=$False }
 } else {
 	Write-Host "Device will skip the `"blue screen`" and restart after each crash."
-	$CrashBehaviour | Set-WmiInstance -Arguments @{ AutoReboot=$True }
+	$crashSettings | Set-WmiInstance -Arguments @{ AutoReboot=$True }
 }
