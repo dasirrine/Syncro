@@ -2,7 +2,7 @@ Import-Module $env:SyncroModule -DisableNameChecking
 <#
 ## Windows Update Monitor ##
 Author: David Sirrine
-Source: 
+Source: https://github.com/dasirrine/Syncro/blob/main/Monitor-Windows_Update.ps1
 Forked from: NullZilla's: script "Monitor - Windows Update"
 https://pastebin.com/TWr17QBg
 [ Nullzilla's Todo: properly handle less common Win10 editions LTSB/LTSC & ESU
