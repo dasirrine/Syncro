@@ -30,9 +30,9 @@ if (!$Recent) { $Recent = '50' }
 # # https://www.timeanddate.com/time/difference/timezone/utc
 if (!$OffsetFromUTC) {
 	$TimeZone = [System.TimeZoneInfo]::Local
-	$OffsetFromUTC = -($TimeZone.BaseUtcOffset.TotalHours)
+	$OffsetFromUTC = ($TimeZone.BaseUtcOffset.TotalHours)
 	if ($TimeZone.IsDaylightSavingTime([datetime]::UtcNow)) {
-		$OffsetFromUTC -= 1
+		$OffsetFromUTC += 1
 	}
 }
 
@@ -117,7 +117,7 @@ $SSDDays = (New-TimeSpan -Start $SSDLastDate -End (Get-Date)).Days
 $ISDLastDate = ([datetime]$UpdateResults.LastInstallationSuccessDate).AddHours($OffsetFromUTC)
 $ISDDays = (New-TimeSpan -Start $ISDLastDate -End (Get-Date)).Days
 $script:Results += "`nLast Search Success: $SSDLastDate ($SSDDays days ago)"
-$script:Results += "`nLast Installation Success: $ISDLastDate ($ISDDays days ago)"
+$script:Results += "Last Installation Success: $ISDLastDate ($ISDDays days ago)"
 
 $Searcher = (New-Object -ComObject 'Microsoft.Update.Session').CreateUpdateSearcher()
 $UpdateHistory = $Searcher.QueryHistory(0, $Searcher.GetTotalHistoryCount()) | 
@@ -127,9 +127,9 @@ $UpdateHistory = $Searcher.QueryHistory(0, $Searcher.GetTotalHistoryCount()) |
 $LastMonth = (Get-Date).AddMonths(-1).ToString("yyyy-MM")
 $ThisMonth = (Get-Date).ToString("yyyy-MM")
 
-$RecentUpdates = $UpdateHistory | Where-Object { $_ -match "($LastMonth|$ThisMonth) (Security Monthly Quality Rollup for Windows|Cumulative Update for Windows)" -or $_ -match "Feature update" }
+$MostRecentUpdate = $UpdateHistory | Where-Object { $_ -match "($LastMonth|$ThisMonth) (Security Monthly Quality Rollup for Windows|Cumulative Update for Windows)" -or $_ -match "Feature update" } | Select-Object -First 1
 
-if (!$RecentUpdates -and $ISDDays -gt $Recent) {
+if (!$MostRecentUpdate -and $ISDDays -gt $Recent) {
 	$Failure = "WARNING - No recent rollup / cumulative update / feature update detected"
 	##$Failure
 	Rmm-Alert -Category "Monitor - Windows Update" $Failure -ErrorAction 
@@ -141,10 +141,10 @@ if (!$RecentUpdates -and $ISDDays -gt $Recent) {
 	#Close-Rmm-Alert -Category "Monitor - Windows Update" -ErrorAction 'SilentlyContinue'
 }
 
-if ($RecentUpdates) {
-	$script:Results += "`Most recent updates:`n"
-	#$script:Results += $RecentUpdates | Select-Object -ExpandProperty Title -First 1
-	$script:Results += $RecentUpdates
+if ($MostRecentUpdate) {
+	$script:Results += "`nMost recent update:`n"
+	#$script:Results += $MostRecentUpdate | Select-Object -ExpandProperty Title -First 1
+	$script:Results += $MostRecentUpdate
 }
 
 #Display all results
