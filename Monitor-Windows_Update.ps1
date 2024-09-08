@@ -78,17 +78,18 @@ if ($DisabledServices) {
 }
 
 
-# Check 2: if Microsoft Update Service is disabled; re-create / re-enable if needed
+# Check 2: if Microsoft Update Service is disabled; re-create if needed
 $UpdateService = New-Object -ComObject Microsoft.Update.ServiceManager
 $MicrosoftUpdateService = $UpdateService.Services | Where-Object { $_.ServiceId -eq '7971f918-a847-4430-9279-4a52d1efe18d' }
 if (!$MicrosoftUpdateService) {
-	$Failure = "Windows Update Service is disabled"
+	$Failure = "Windows Update Service is disabled or not present"
 	##$Failure
 	$script:Results += "`n$Failure" ##
 
 	# enable Windows updates unless explicitly directed otherwise
 	if ($enableWindowsUpdates -ne $false) {
 		$UpdateService.AddService2('7971f918-a847-4430-9279-4a52d1efe18d', 7, '')
+		$script:Results += "`nEnabled Windows Update service"
 	}
 }
 
